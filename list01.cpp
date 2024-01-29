@@ -1,130 +1,43 @@
-#include "list01.h"
-#include <iostream>
+/*
+리스트에 특정 데이터형의 항목을 0개 또는 그 이상을 저장할 수 있다.
+비어 있는 리스트를 생성할 수 있다.
+리스트에 항목들을 추가할 수 있다.
+리스트에 있는 항목을 삭제할 수 있다. 
+리스트가 비어 있는지 결정할 수 있다.
+리스트가 가득 차 있는지 결정할 수 있다. 
+리스트에 원하는 데이터가 저장되어 있는지 확인해 볼 수 있다.
+리스트의 각 항목에 대해 몇가지 원하는 동작을 수행할 수 있다.
+    - 이때 원하는 동작(을 하는 함수)은 private 멤버에 정의한다.
+        * public인터페이스를 구성하지 않는 클래스 기능의 세부적인 구현은 private멤버에 넣는다.
+    - 해당 리스트를 링크드 리스트로 구현해 보자.
+
+*/
+
+#ifndef LIST01_H_
+#define LIST01_H_
+typedef int Item;             
 
 
-List::List() {
-    items = new int[MAX];                        
-    ct = 0;                         //항목 갯수 0
-    std::cout << "크기 " << MAX << "개 짜리 리스트 생성\n"
-            << "현재 항목 수 : " << ct << std::endl;
-}
+class List {              
+    private :
+        enum {MAX = 10};
+        Item * items;                            //Head 추적
+        int ct;                                 //리스트에 추가된 항목 갯수 추적
+        void apply(Item & I) {I += 20;}        //visit()인터페이스에서 호출되어 각 항목에 적용되는 함수, 그때그때 필요에 따라 수정해서 사용
+    public :
+        List();         //default constructor        이것 외에 별도의 생정자는 가지지 않는다.
+        ~List();        //destructor
+        bool List_isempty() const;                    //비었으면 true, 아니면 false
+        bool List_isfull() const;                     //꽉찼으면 true, 아니면 false
+        bool List_add();
+        bool List_delete();                 
+        bool List_Search(const Item &) const ;         //원하는 정보가 있는지 확인한다, 있으면 true, 없으면 false      
+        void List_show();
+        void visit(void (*pf)(Item &));         //각 항목을 방문하여 원하는 조작을 가한다. 적용할 조작의 내용은 private : apply()가 결정.
+};
 
 
-List::~List() {
-    delete [] items;
-    std::cout << "List를 삭제했습니다.\n";
-}
+#endif
 
 
-bool List::List_isempty () const {
-    if (ct == 0)
-        return true;
-    return false;
-}
-
-
-bool List::List_isfull () const {
-    if (ct == MAX)
-        return true;
-    return false;
-}
-
-
-bool List::List_add() {
-    using std::cout;
-    using std::cin;
-    using std::endl;
-    
-    if (List_isfull()) 
-    {
-        cout << "리스트가 가득 찼습니다.\n";
-        return false;
-    }
-    else {
-        cout << "Item입력 : ";
-        int temp_item;
-        while(true) {
-            if (cin >> temp_item)
-            {
-                while (cin.get() != '\n')
-                    continue;
-                break;
-            }
-            else 
-            {
-                cout << "잘못된 입력. 다시 입력 하시오\n";
-                continue;
-            }   
-        }
-        items[ct++] = temp_item;
-        cout << items[ct - 1] << "이 리스트에 추가되었습니다.\n";
-        cout << "현재 저장된 항목 수 : " << ct << "개\n";
-        
-        return true;
-    }
-}
-
-
-bool List::List_delete() {
-    using std::cin;
-    using std::cout;
-    using std::endl;
-
-    Item delete_item;
-    cout << "삭제할 Item을 입력 : ";
-    cin >> delete_item;
-    if (List_Search(delete_item))
-    {
-        int count;
-        for (count = 0; count < ct; count++)
-            if (delete_item == items[count])
-            {
-                if (count == MAX - 1)                   //tail item 이면 걍 삭제
-                {
-                    items[MAX - 1] = 0;
-                    ct--;
-                }
-                else                                    //아니면 리스트를 갱신해줘야 한다.
-                {    
-                for (int i = count; i < ct - 1; i++)
-                    items[i] = items[i + 1];
-                ct--;
-                }
-            }
-        return true;
-    }
-
-    return false;
-}
-
-
-void List::List_show() {
-    for (int count = 0; count < ct; count++)
-        std::cout << count + 1 << "번째 항목 : " << items[count] << std::endl;
-}
-
-
-bool List::List_Search(const Item & i) const {
-    int count;
-    if (List_isempty())
-        std::cout << "리스트가 텅 비었습니다\n";
-    else
-    {
-        for (count = 0; count < ct; count++)
-            if (i == items[count])
-            {
-                std::cout << count + 1 << "번째 항목에 해당 데이터가 저장되어 있습니다.\n";
-                return true;
-            }
-            else
-                continue;
-    }
-    if (count >= ct)
-        std::cout << "해당 항목이 리스트에 존재하지 않습니다.\n";
-    return false;
-}
-
-void List::visit(void (*pf)(Item & i)) {
-    for (int count = 0; count < ct; count++)
-        pf(items[count]);
-}
+//사용자는 public interface의 사용법만 숙지하면 되게끔.
